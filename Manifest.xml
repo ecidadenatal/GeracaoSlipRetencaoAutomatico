@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <plugin name="GeracaoSlipRetencaoAutomatico" label="Geracao de Slips de Retencoes Automatico" plugin-version="1.0" ecidade-version="2.3.46" id-modulo="39">
+    <id id="GeracaoSlipRetencaoAutomatico"> </id>
+    <files>
+
+      <!-- classe -->
+      <file name="db_retencaoreceitaslip_classe.php"                path="/classes/db_retencaoreceitaslip_classe.php" />
+      <file name="db_retencaotiporecgeraslip_classe.php"            path="/classes/db_retencaotiporecgeraslip_classe.php" />
+
+      <!-- outro -->
+      <file name="GeracaoSlipRetencaoAutomatico.xml"                path="/modification/xml/GeracaoSlipRetencaoAutomatico.xml" />
+      <file name="plugins.retencaoreceitaslip.dd.xml"               path="/dd/tabelas/plugins.retencaoreceitaslip.dd.xml" />
+      <file name="plugins.retencaotiporecgeraslip.dd.xml"           path="/dd/tabelas/plugins.retencaotiporecgeraslip.dd.xml" />
+      <file name="emp4_configuraContaPagadoraRetencoesSlip001.php"  path="/emp4_configuraContaPagadoraRetencoesSlip001.php" />
+      <file name="cai2_retencaoreceitaslip002.php"                  path="/cai2_retencaoreceitaslip002.php" />
+      
+    </files>
+    <estrutura install="/instalacao.sql" uninstall="/desinstalacao.sql" >
+    </estrutura>
+    
+  </plugin>
+</manifest>
