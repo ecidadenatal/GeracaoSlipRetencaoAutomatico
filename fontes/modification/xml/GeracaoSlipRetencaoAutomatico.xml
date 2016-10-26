@@ -441,7 +441,8 @@
                 $oSlip->setHistorico(9017);
                 $oSlip->setNumCgm($oDadosRetencoes->numcgm);
                 $sObservacao  = "Referente ao pagamento das retenções geradas para o recurso {$oDadosRetencoes->recurso}";
-                $sObservacao .= ", cujo pagamento será agendado na OP auxiliar nº {$oDaoOPAuxiliar->e42_sequencial}";
+                $sObservacao .= ", cujo pagamento será agendado na OP nº {$oDadosRetencoes->pagordem}";
+                
                 $oSlip->setObservacoes($sObservacao);
                 $oSlip->save();
                 
