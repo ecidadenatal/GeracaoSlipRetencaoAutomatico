@@ -13,6 +13,7 @@
       <file name="plugins.retencaoreceitaslip.dd.xml"               path="/dd/tabelas/plugins.retencaoreceitaslip.dd.xml" />
       <file name="plugins.retencaotiporecgeraslip.dd.xml"           path="/dd/tabelas/plugins.retencaotiporecgeraslip.dd.xml" />
       <file name="emp4_configuraContaPagadoraRetencoesSlip001.php"  path="/emp4_configuraContaPagadoraRetencoesSlip001.php" />
+      <file name="cai2_retencaoreceitaslip001.php"                  path="/cai2_retencaoreceitaslip001.php" />
       <file name="cai2_retencaoreceitaslip002.php"                  path="/cai2_retencaoreceitaslip002.php" />
       
     </files>
