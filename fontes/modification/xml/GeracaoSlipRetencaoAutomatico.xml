@@ -441,7 +441,7 @@
                 $oSlip->setHistorico(9017);
                 $oSlip->setNumCgm($oDadosRetencoes->numcgm);
                 $sObservacao  = "Referente ao pagamento das retenções geradas para o recurso {$oDadosRetencoes->recurso}";
-                $sObservacao .= ", cujo pagamento será agendado na OP auxiliar nº {$oDaoOPAuxiliar->e42_sequencial}";
+                $sObservacao .= ", cujo pagamento é ref. a OP {$oDadosRetencoes->pagordem}";
                 $oSlip->setObservacoes($sObservacao);
                 $oSlip->save();
                 
@@ -510,6 +510,14 @@
     </operation>
   </file>
   
+  <file path='model/agendaPagamento.model.php'>
+    <operation>
+      <search regex="true" limit="2"><![CDATA[(\$oDaoEmpAgeMov->e81_valor\s*=\s*\$oObjeto->nValor;)]]></search>
+        <add>
+          <![CDATA[$oDaoEmpAgeMov->e81_valor  = (float)"".$oObjeto->nValor."";]]></add>
+    </operation>
+  </file>  
+  
   <file path='model/retencaoNota.model.php'>
     <operation>
       <search regex="true"><![CDATA[private\s*\$aRetencoes\s*=\s*array\(\)\s*;]]></search>
@@ -576,4 +584,46 @@
     $1]]></add>
     </operation>
   </file>   
+  
+  <file path='cai4_transferencia.RPC.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$oRetorno->iInstituicaoOrigem\s*=\s*\$oSlip->getInstituicao\(\);)]]></search>
+        <add>
+          <![CDATA[      
+            /*Plugin GeracaoSlipRetencaoAutomatica */      
+            //verificamos se o slip possui configuração na agenda
+			$oRetorno->configuracao_agenda = 'false';
+            
+			$oDaoEmpAgeConf = db_utils::getDao("empageconf");
+            $oDaoEmpAgeSlip = db_utils::getDao("empageslip");
+            
+            $rsEmpAgeSlip = $oDaoEmpAgeSlip->sql_record($oDaoEmpAgeSlip->sql_query_file(null, $oSlip->getCodigoSlip())); 
+            $iMovimentoSlip = db_utils::fieldsMemory($rsEmpAgeSlip, 0)->e89_codmov;
+            
+            $sSqlEmpAgeConf = $oDaoEmpAgeConf->sql_query_file($iMovimentoSlip);
+            $rsEmpageConf   = $oDaoEmpAgeConf->sql_record($sSqlEmpAgeConf);
+            if ($oDaoEmpAgeConf->numrows > 0) {
+              $oRetorno->configuracao_agenda = 'true';
+            }
+            /*Plugin GeracaoSlipRetencaoAutomatica */
+            
+			$1]]></add>
+    </operation>
+  </file>   
+  
+  <file path='cai4_alteracaoslip001.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$\('ctnSlipPagamento'\).innerHTML = "";)]]></search>
+        <add>
+          <![CDATA[  
+  /*Plugin GeracaoSlipRetencaoAutomatica */              
+  if (<?php echo $oGet->db_opcao?> == "3" && oRetorno.configuracao_agenda == "true" ) {
+	alert('Operação não permitida.\nSlip possui movimentos configurados na Agenda.');   
+    return false;
+  }
+  /*Plugin GeracaoSlipRetencaoAutomatica */
+  
+  $1]]></add>
+    </operation>
+  </file>  
 </modification>

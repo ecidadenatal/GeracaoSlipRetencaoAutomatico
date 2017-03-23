@@ -1,0 +1,41 @@
+<?xml version="1.0" standalone="yes" ?>
+<table name="plugins.receitagrupo" description="Guarda os grupos de receita." prefix="" label="Grupo de Receita" type="0">
+  <fields>
+    <field name="sequencial"
+           conteudo="int4"
+           description="Sequencial"
+           inivalue="0"
+           label="Sequencial"
+           size="10"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="1"
+           tipoobj="text"
+           labelrel="Sequencial"
+           reference=""
+           ispk="t"
+           hassequence="t">
+      <sequence name="plugins.receitagrupo_sequencial_seq"></sequence>
+    </field>
+    <field name="descricao"
+           conteudo="text"
+           description="Descrição"
+           inivalue=""
+           label="Descrição"
+           size="1"
+           null="f"
+           uppercase="f"
+           autocompl="f"
+           aceitatipo="0"
+           tipoobj="text"
+           labelrel="Descrição"
+           reference=""
+           ispk="f"
+           hassequence="f">
+    </field>
+  </fields>
+  <primarykey>
+    <fieldpk name="sequencial"></fieldpk>
+  </primarykey>
+</table>

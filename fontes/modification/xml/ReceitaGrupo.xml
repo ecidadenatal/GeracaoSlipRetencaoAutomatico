@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<modification>
+  <name>Receita Grupo</name>
+  <id>ReceitaGrupo</id>
+  <ecidade-version>2.3.39</ecidade-version>
+  <file path='cai2_correceitas001.php'>
+    <operation>
+      <search regex="true"><![CDATA[(<script.*src="scripts\/scripts.js"><\/script>)]]></search>
+      <add>
+        <![CDATA[
+        $1
+        <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(qry\s*\+=\s*"&recurso="\s*\+\s*recurso.*;)]]></search>
+      <add>
+        <![CDATA[$1
+  qry += "&congrupo="+$F('filtroreceitagrupo');]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(<tr>\s*\n*<td.*Estrutural\s*da\s*Receita\s*:\s*<\/strong>)]]></search>
+      <add>
+        <![CDATA[
+      <tr>
+        <td align="right">
+          <strong>Grupo Receita:</strong>
+        </td>
+        <td>
+          <?
+            $oReceitaGrupo = db_utils::getDao("receitagrupo");
+            $rsReceitaGrupo = $oReceitaGrupo->getReceitaGrupo(null);
+            $iNumRowsReceitaGrupo = $oReceitaGrupo->numrows;
+            $aReceitaGrupo = array();
+            $aReceitaGrupo[0] = "Sem grupo";
+
+            for($iInd=0;$iInd<$iNumRowsReceitaGrupo;$iInd++){
+              $oDadosReceitaGrupo = db_fieldsmemory($rsReceitaGrupo,$iInd);
+              $aReceitaGrupo[$oDadosReceitaGrupo->sequencial] = $oDadosReceitaGrupo->descricao;
+            }
+            
+            db_select("filtroreceitagrupo", $aReceitaGrupo, true, 1, "");
+          ?>
+        </td>
+      </tr> 
+      $1       
+]]>
+      </add>
+    </operation>
+  </file>
+  
+  <file path='cai2_correceitas002.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$where\s*=\s*('|")('|");)]]></search>
+      <add>
+        <![CDATA[
+        $1
+if ($congrupo != null && $congrupo != '' && $congrupo != 0) {
+    $where = ' o.k02_estorc in (select k02_estorc 
+                                  from taborc 
+                                       inner join plugins.receitagrupoitem on plugins.receitagrupoitem.receita = k02_codigo
+                                       inner join plugins.receitagrupo on plugins.receitagrupo.sequencial = plugins.receitagrupoitem.receitagrupo
+                                 where plugins.receitagrupo.sequencial = '.$congrupo.') and ';
+} else ]]>
+      </add>
+    </operation>
+  </file> 
+
+  <file path='cai4_planilhaarrecadacao.RPC.php'>
+
+    <operation>
+      <search regex="true"><![CDATA[(\$oPlanilhaArrecadacao->salvar\(\);)]]></search>
+      <add>
+        <![CDATA[$1
+
+      $oDaoUsuarioCGM = new cl_db_usuacgm();
+      $rsDadosCgm     = $oDaoUsuarioCGM->sql_record($oDaoUsuarioCGM->sql_query_file(db_getsession('DB_id_usuario')));
+      $oPlanilhaUsu   = db_utils::getDao('placaixausu');
+      $oPlanilhaUsu->numcgm = db_utils::fieldsMemory($rsDadosCgm, 0)->cgmlogin;
+      $oPlanilhaUsu->codpla = $oPlanilhaArrecadacao->getCodigo();
+      $oPlanilhaUsu->incluir(null);
+      ]]>
+      </add>
+    </operation>
+  
+  </file>  
+
+  <file path='cai2_relplacaixa002.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$where.*k144_numeroprocesso.*;\n*\s*})]]></search>
+      <add>
+        <![CDATA[$1
+
+$order = " order by k80_codpla ";
+if (isset($ordena) and $ordena == 'D') {
+  $order = " order by k80_data ";
+}
+]]>
+      </add>
+    </operation>
+
+    <operation>
+      <search regex="true"><![CDATA[order\s*by\s*k80_codpla]]></search>
+      <add>
+        <![CDATA[$order]]>
+      </add>
+    </operation>
+
+    <operation>
+      <search regex="true"><![CDATA[k12_estorn\n*.*from\s*placaixarec]]></search>
+      <add>
+        <![CDATA[k12_estorn,
+                     case when substr(o.k02_estorc, 1, 1) = '9' then 't' else 'f' end as deducao,
+   		             (select coalesce(rh01_ponto, '0') || ' - ' || coalesce(z01_nome, '')
+   		                from plugins.placaixausu 
+                             left join rhpessoal on rh01_numcgm = placaixausu.numcgm
+                             left join cgm       on z01_numcgm  = placaixausu.numcgm
+   	                   where codpla = k81_codpla
+   		               order by sequencial desc limit 1) as usuario
+                from placaixarec]]>
+      </add>
+    </operation>
+
+    <operation>
+      <search regex="true"><![CDATA[(if \(\$oPla->k12_estorn == \'t\')]]></search>
+      <add>
+        <![CDATA[$1 && $oPla->deducao == "f"]]>
+      </add>
+    </operation>
+    
+    <operation>
+      <search regex="true"><![CDATA[(\$fValorPla = \$oRec->k12_estorn == \"t\")]]></search>
+      <add>
+        <![CDATA[$1 && $oRec->deducao == "f"]]>
+      </add>
+    </operation>
+        
+    <operation>
+      <search regex="true"><![CDATA[(\$pdf.*db_formatar.*\$oPla->k12_data.*;)]]></search>
+      <add>
+        <![CDATA[$1
+         $pdf->cell(50,$alt,'Usuário ',0,0); 
+         $pdf->cell(50,$alt,$oRec->usuario,0,1);
+         ]]>
+      </add>
+    </operation>
+
+  </file>  
+
+  <file path='cai2_relplacaixa001.php'>
+
+    <operation>
+      <search regex="true"><![CDATA[(qry\s*\+=\s*.*parametro.*;)]]></search>
+      <add>
+        <![CDATA[$1
+  qry+= '&ordena='+document.form1.ordena.value;]]>
+      </add>
+    </operation>
+  
+    <operation>
+      <search regex="true" flag="U"><![CDATA[(\<\?.*k144_numeroprocesso.*((\n*.*)*)\<\/tr\>)]]></search>
+      <add>
+        <![CDATA[$1
+      <tr>
+        <td nowrap="nowrap">
+          <strong>Ordenar por:</strong>
+        </td>
+        <td>
+          <?
+            $aOrdena = array("D"=>"Data de Autenticação","N"=>"Numeração de planilha");
+            db_select('ordena',$aOrdena,true,2);
+          ?>
+        </td>
+      </tr>
+      ]]>
+      </add>
+    </operation>
+
+  </file>  
+
+</modification>
