@@ -414,6 +414,8 @@
                
                $aMovimentosProcessados[] = $oMovimento->iCodMov;
                
+               AssinaturaOrdenadorDespesa::gravarAssinatura(AssinaturaOrdenadorDespesa::ASSINATURA_REMESSA_BANCARIA,$iCodNovoMovimento,db_getsession("DB_coddepto"));
+               
              }
                 
              if ($oDadosRetencoes->geraslip == "t") {
